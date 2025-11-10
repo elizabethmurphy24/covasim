@@ -8,20 +8,16 @@ import pandas as pd
 from scipy.integrate import odeint
 import cvxpy as cp
 
-# Assign each person to a region
-# Track new infections by region each day
-# Plot the results as heatmap
 
 n_rows, n_cols = 2, 2
 n_regions = n_rows * n_cols
-pop_size = 20000
+pop_size = 100000
 location = 'Zambia'
-n_days = 180
 
 pars = dict(
     pop_size = pop_size,
     pop_type = 'hybrid',
-    n_days = n_days,
+    n_days = 180,
     location = location,
     pop_infected = 0,   # no automatic initial infections
     n_imports = 0,      # no imported infections
@@ -75,7 +71,7 @@ for t in range(len(sim.results['new_infections'])):
 
 dates = sim.results['date']
 
-# plot heatmap
+# PLOT heatmap
 plt.figure(figsize=(10, 4))
 plt.imshow(new_cases.T, aspect='auto', cmap='Reds', origin='lower')
 plt.colorbar(label='New infections per day')
@@ -118,7 +114,7 @@ c = sol[:,3:].sum(axis=1)
 c = c/c.sum()
 
 
-# shedding load density plot
+# PLOT shedding load density
 fig, ax = plt.subplots(figsize=(6, 4))
 ax.plot(t, c, linewidth=2)
 ax.set_xlabel("Days since infection")
@@ -156,7 +152,7 @@ for idx_pos, pid in enumerate(inds_in_region0):
 # aggregate signals
 agg_ind_signal = ind_shed.sum(axis=0)
 
-# plot
+# PLOT
 fig, ax = plt.subplots(figsize=(10, 5))
 ax.plot(dates, agg_ind_signal, label='Aggregated individual shedding', color='tab:red')
 ax.plot(dates, ww_signal, label='Simulated wastewater signal', color='tab:blue')

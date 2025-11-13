@@ -131,30 +131,37 @@ plt.show()
 
 
 
-# work on
+# individual viral load shedding
+daily_shedding = np.zeros((pars['n_days']+1, sim.n))
 
-# indiviual level shedding
-n = len(sim.results['new_infections'])
-infected_inds = np.where(sim.people.date_infectious >= 0)[0]
-inds_in_region0 = infected_inds[sim.people.region[infected_inds] == region]
-n_ind = len(inds_in_region0)
+# record rel_trans every day
+def track_shedding(sim):
+    t = sim.t
+    if t < daily_shedding.shape[0]:
+        daily_shedding[t, :] = sim.people.rel_trans
+    return
 
-# individual shedding
-ind_shed = np.zeros((n_ind, n))
+# new simulation
+sim = cv.Sim(pars, interventions=track_shedding)
+sim.initialize()
 
-for idx_pos, pid in enumerate(inds_in_region0):
-    start_day = int(sim.people.date_infectious[pid])
-    for tau in range(len(c)):
-        t = start_day + tau
-        if 0 <= t < n:
-            ind_shed[idx_pos, t] += c[tau]
+# assign regions again
+sim.people.region = region_ids
 
-# aggregate signals
-agg_ind_signal = ind_shed.sum(axis=0)
+# reseed infections
+initial_inds = np.where(sim.people.region == 0)[0][:20]
+sim.people.infect(initial_inds)
 
-# PLOT
-fig, ax = plt.subplots(figsize=(10, 5))
-ax.plot(dates, agg_ind_signal, label='Aggregated individual shedding', color='tab:red')
-ax.plot(dates, ww_signal, label='Simulated wastewater signal', color='tab:blue')
+# run sim
+sim.run()
+
+# extract region 0
+region = 0
+region_inds = np.where(sim.people.region == region)[0]
+
+ww_signal_reltrans = daily_shedding[:, region_inds].sum(axis=1)
+
+fig, ax = plt.subplots(figsize=(10, 6))
+ax.plot(dates, ww_signal_reltrans, label='rel_trans', color='tab:blue')
 ax.legend()
 plt.show()

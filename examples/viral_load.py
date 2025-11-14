@@ -48,7 +48,7 @@ for t in range(sim.npts):
     date_rec = sim.people.date_recovered
     date_dead = sim.people.date_dead
     viral_load = cvu.compute_viral_load(t, date_inf, date_rec, date_dead, frac_time, load_ratio, high_cap)
-# store only individuals from Region 0
+    # store only individuals from Region 0
     vl_store[t, :] = viral_load[inds_region0]
 
 

@@ -10,7 +10,7 @@ import covasim.utils as cvu
 
 n_rows, n_cols = 2, 2
 n_regions = n_rows * n_cols
-pop_size = 1000
+pop_size = 10000
 location = 'Zambia'
 
 pars = dict(
@@ -48,11 +48,15 @@ for t in range(sim.npts):
     date_rec = sim.people.date_recovered
     date_dead = sim.people.date_dead
     viral_load = cvu.compute_viral_load(t, date_inf, date_rec, date_dead, frac_time, load_ratio, high_cap)
-
-
 # store only individuals from Region 0
-vl_store[t, :] = viral_load[inds_region0]
+    vl_store[t, :] = viral_load[inds_region0]
 
-# not correct output - FIX
-print(vl_store.shape)
-print(vl_store[0])
+
+days = np.arange(sim.npts)
+
+fig, ax = plt.subplots(figsize=(10, 6))
+ww_signal_region0 = vl_store.sum(axis=1)
+plt.plot(days, ww_signal_region0, color='tab:red', label='Region 0 total viral load')
+plt.xlabel('Day')
+plt.ylabel('Viral load')
+plt.show()

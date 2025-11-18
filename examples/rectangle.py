@@ -165,3 +165,56 @@ fig, ax = plt.subplots(figsize=(10, 6))
 ax.plot(dates, ww_signal_reltrans, label='rel_trans', color='tab:blue')
 ax.legend()
 plt.show()
+
+
+
+# EFFECTIVE REPRODUCTION NUMBER
+
+dates_ts = pd.to_datetime(sim.results['date'])
+
+# wastewater inferred cases ?
+infects = pd.Series(ww_signal, index=dates_ts)
+infects = infects[infects > 0]
+
+# covasim cases
+cases = pd.Series(new_cases, index=dates_ts)
+
+# covasim R_e
+sim_re = sim.results['r_eff'].values
+sim_re_series = pd.Series(sim_re, index=dates_ts)
+
+import epyestim
+import epyestim.covid19 as covid19
+
+date_ind = pd.date_range(infects.index.min(),infects.index.max(),freq='D')
+infects = infects.reindex(date_ind)
+infects = infects.fillna(0)
+ww_time_varying_r = covid19.r_covid(infects)
+sim_time_varying_r = covid19.r_covid(cases)
+
+
+fig, ax = plt.subplots(1,1, figsize=(11, 5))
+ax.plot(sim_time_varying_r.index,sim_time_varying_r.loc[:,'Q0.5'],color='#ff7f0e',label='Covasim Cases')
+ax.fill_between(sim_time_varying_r.index, sim_time_varying_r['Q0.025'], sim_time_varying_r['Q0.975'], color='#ff7f0e', alpha=0.2)
+ax.plot(sim_re_series.index, sim_re_series.values, color="#4e0eff", label='Covasim R_e')
+#ax.fill_between(sim_re_series.index, sim_re_series['Q0.025'], sim_re_series['Q0.975'], color='#ff7f0e', alpha=0.2)
+
+# ax.plot(ww_time_varying_r.index,ww_time_varying_r.loc[:,'Q0.5'],color='#1f77b4',label='Cases Inferred from WW')
+# ax.fill_between(ww_time_varying_r.index, ww_time_varying_r['Q0.025'], ww_time_varying_r['Q0.975'], color='#1f77b4', alpha=0.2)
+ax.set_ylabel('$R_e$')
+ax.set_ylim([-0.2, 3])
+ax.set_yticks([0, 1, 2])
+ax.axhline(y=1, color='red',linewidth=.7)
+plt.legend(loc='lower right')
+#ax.xaxis.set_major_locator(mdates.MonthLocator(bymonthday=1))
+#ax.xaxis.set_minor_locator(mticker.NullLocator())
+#ax.xaxis.set_major_formatter(mdates.DateFormatter('%b %Y'))
+fig.autofmt_xdate()
+plt.show()
+
+
+print(sim.results['r_eff'].values[:20])
+# [3.21004993 3.50187266 3.57300642 3.5576068  3.54291047 3.51565718
+# 3.45472311 3.46832504 3.55711422 3.51827703 3.32933567 3.32383208
+# 3.49370891 3.30173734 2.72557355 2.37236892 2.36162143 2.21253799
+# 1.81167899 1.57379071]

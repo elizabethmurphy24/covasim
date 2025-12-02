@@ -173,11 +173,13 @@ import epyestim
 import epyestim.covid19 as covid19
 
 dates_ts = pd.to_datetime(sim.results['date'])
+xmin = pd.to_datetime("2020-03-08")
+xmax = pd.to_datetime("2020-08-18")
 
 # covasim cases R_e
 # cases = pd.Series(new_cases, index=dates_ts)
 cases = pd.Series(sim.results['new_infections'].values, index=dates_ts)
-sim_time_varying_r = covid19.r_covid(cases)
+sim_time_varying_r = covid19.r_covid(cases, smoothing_window=7)
 
 # covasim default output R_e
 sim_re = sim.results['r_eff'].values
@@ -192,14 +194,15 @@ ax.set_ylabel('$R_e$')
 ax.set_ylim([-0.2, 4])
 ax.set_yticks([0, 1, 2, 3])
 ax.axhline(y=1, color='red',linewidth=.7)
+ax.set_xlim(xmin, xmax)
 plt.legend(loc='lower right')
 plt.show()
 
 
-print(sim.results['r_eff'].values[:20])
-# [3.21004993 3.50187266 3.57300642 3.5576068  3.54291047 3.51565718
-# 3.45472311 3.46832504 3.55711422 3.51827703 3.32933567 3.32383208
-# 3.49370891 3.30173734 2.72557355 2.37236892 2.36162143 2.21253799
-# 1.81167899 1.57379071]
+# transmission tree
+tt = sim.make_transtree()
 
-print(sim_time_varying_r['Q0.5'].head(20))
+tt.plot()
+print(tt)
+
+#{"Transmission Network":{"model":"Susceptible-Exposed-Infected-Removed (SEIR)","param":{}},"Viral Phylogeny (Transmissions)":{"model":"Transmission Tree","param":{}}}

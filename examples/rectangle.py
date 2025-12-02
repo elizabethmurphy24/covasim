@@ -7,6 +7,7 @@ from ete3 import Tree, TreeStyle, NodeStyle, faces, AttrFace
 import pandas as pd
 from scipy.integrate import odeint
 import cvxpy as cp
+import networkx as nx
 
 
 n_rows, n_cols = 2, 2
@@ -200,9 +201,13 @@ plt.show()
 
 
 # transmission tree
-tt = sim.make_transtree()
+tt = sim.make_transtree(to_networkx=True)
 
-tt.plot()
+# tt.plot()
+# tt.plot_histograms()
 print(tt)
+
+nx.draw(tt.graph)
+plt.show()
 
 #{"Transmission Network":{"model":"Susceptible-Exposed-Infected-Removed (SEIR)","param":{}},"Viral Phylogeny (Transmissions)":{"model":"Transmission Tree","param":{}}}

@@ -12,7 +12,7 @@ import networkx as nx
 
 n_rows, n_cols = 2, 2
 n_regions = n_rows * n_cols
-pop_size = 100000
+pop_size = 100
 location = 'Zambia'
 
 pars = dict(
@@ -82,7 +82,8 @@ plt.yticks(range(n_regions), [f"Region_{i}_{j}" for i in range(n_rows) for j in 
 tick_idx = np.linspace(0, len(dates)-1, 6, dtype=int)
 plt.xticks(tick_idx, [dates[i].strftime('%b %d') for i in tick_idx], rotation=45)
 plt.tight_layout()
-plt.show()
+plt.savefig('new_infections.pdf')
+plt.close()
 
 
 
@@ -127,7 +128,8 @@ fig, ax = plt.subplots(figsize=(10, 6))
 ax.plot(dates, new_cases, label='New infections from covasim', color='tab:red')
 ax.plot(dates, ww_signal, label='Simulated wastewater signal', color='tab:blue')
 ax.legend()
-plt.show()
+plt.savefig('ww_signal_and_cases.pdf')
+plt.close()
 
 
 
@@ -165,7 +167,8 @@ ww_signal_reltrans = daily_shedding[:, region_inds].sum(axis=1)
 fig, ax = plt.subplots(figsize=(10, 6))
 ax.plot(dates, ww_signal_reltrans, label='rel_trans', color='tab:blue')
 ax.legend()
-plt.show()
+plt.savefig('rel_trans.pdf')
+plt.close()
 
 
 
@@ -196,18 +199,27 @@ ax.set_ylim([-0.2, 4])
 ax.set_yticks([0, 1, 2, 3])
 ax.axhline(y=1, color='red',linewidth=.7)
 ax.set_xlim(xmin, xmax)
-plt.legend(loc='lower right')
-plt.show()
+plt.savefig('transmission_plots.pdf')
+plt.close()
 
+from collections import deque, defaultdict
 
 # transmission tree
 tt = sim.make_transtree(to_networkx=True)
+from networkx.drawing.nx_pydot import graphviz_layout
 
+pos = graphviz_layout(tt.graph, prog="dot")
+
+plt.figure(figsize=(10, 6))
+nx.draw(tt.graph,pos,node_size=10)
+plt.savefig('transmission_tree.pdf')
+plt.close()
 # tt.plot()
 # tt.plot_histograms()
-print(tt)
+# print(tt)
 
-nx.draw(tt.graph)
-plt.show()
+# nx.draw(tt.graph)
+# plt.savefig('f4.pdf')
+# plt.close()
 
 #{"Transmission Network":{"model":"Susceptible-Exposed-Infected-Removed (SEIR)","param":{}},"Viral Phylogeny (Transmissions)":{"model":"Transmission Tree","param":{}}}

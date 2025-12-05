@@ -222,4 +222,53 @@ plt.close()
 # plt.savefig('f4.pdf')
 # plt.close()
 
-#{"Transmission Network":{"model":"Susceptible-Exposed-Infected-Removed (SEIR)","param":{}},"Viral Phylogeny (Transmissions)":{"model":"Transmission Tree","param":{}}}
+
+df = sim.make_transtree().detailed
+df = df.dropna(subset=['source', 'target', 'date'])
+
+df = df[['source', 'target', 'date']].rename(
+    columns={'source': 'infector', 'target': 'infectee', 'date': 'infection_time'}
+)
+
+df['infector'] = df['infector'].astype(int)
+df['infectee'] = df['infectee'].astype(int)
+df['infection_time'] = df['infection_time'].astype(float)
+
+df = df.sort_values('infection_time').reset_index(drop=True)
+
+# remove reinfection events (keep first infection only)
+df_no_reinfection = (
+    df.sort_values('infection_time')
+      .drop_duplicates(subset=['infectee'], keep='first')
+      .reset_index(drop=True)
+)
+
+# add None rows for first time infectors
+seen_people = set()
+rows = []
+
+for _, row in df_no_reinfection.iterrows():
+    infector = row['infector']
+    infectee = row['infectee']
+    time = row['infection_time']
+
+    if infector not in seen_people:
+        rows.append({'infector': 'None', 'infectee': infector, 'infection_time': time})
+        seen_people.add(infector)
+
+    rows.append({'infector': infector, 'infectee': infectee, 'infection_time': time})
+    seen_people.add(infectee)
+
+df_fixed = pd.DataFrame(rows)
+
+# df_fixed.to_csv("my_transmission_tree_fixed.tsv", sep="\t", index=False)
+
+
+# my_sample_times.csv
+df_samples = df_fixed[['infectee', 'infection_time']].rename(columns={'infectee': 'id', 'infection_time': 'time'})
+df_samples = df_samples.sort_values('time').reset_index(drop=True)
+
+# df_samples.to_csv("my_sample_times.tsv", sep="\t", index=False)
+
+# my_transmission_tree.tsv → transmission network
+# my_sample_times.tsv → sample times

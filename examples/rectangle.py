@@ -272,3 +272,12 @@ df_samples = df_samples.sort_values('time').reset_index(drop=True)
 
 # my_transmission_tree.tsv → transmission network
 # my_sample_times.tsv → sample times
+
+
+import subprocess
+
+subprocess.run([
+    "/Users/elizabethmurphy/CoaTran/coatran_transtree",
+    "my_transmission_tree_fixed.tsv",
+    "my_sample_times.tsv"
+], stdout=open("my_tree.nwk", "w"))

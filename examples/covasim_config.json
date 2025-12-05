@@ -1,0 +1,22 @@
+{
+  "TransmissionNodeSample": {
+    "class": "TransmissionNodeSample_TransmissionFile",
+    "transmission_file": "my_transmission_tree_fixed.tsv"
+  },
+  "TransmissionTimeSample": {
+    "class": "TransmissionTimeSample_TransmissionFile",
+    "transmission_file": "my_sample_times.tsv"
+  },
+  "NodeEvolution": {
+    "class": "NodeEvolution_TransmissionTree"
+  },
+  "NumTimeSample": {
+    "class": "NumTimeSample_Once"
+  },
+  "SequenceEvolution": {
+    "class": "SequenceEvolution_NoMutation"
+  },
+  "Sequencing": {
+    "class": "Sequencing_Perfect"
+  }
+}
